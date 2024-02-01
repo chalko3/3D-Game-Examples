@@ -20,6 +20,15 @@ public class JohnLemonMovement : MonoBehaviour
         Physics.gravity *= GravityModifer;
     }
 
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space) && IsOnGround)
+        {
+            _Rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
+            IsOnGround = false;
+        }
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -38,10 +47,13 @@ public class JohnLemonMovement : MonoBehaviour
 
         _Rigidbody.MovePosition(_Rigidbody.position + _Movement * moveSpeed * Time.deltaTime);
         _Rigidbody.MoveRotation(_Rotation);
+    }
 
-        if(Input.GetKeyDown(KeyCode.Space) && IsOnGround)
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Ground"))
         {
-            
+            IsOnGround = true;
         }
     }
 }
