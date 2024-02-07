@@ -5,19 +5,28 @@ using UnityEngine;
 public class JohnLemonMovement : MonoBehaviour
 {
     public float turnSpeed = 20f;
-    public float moveSpeed = 10f;
+    public float moveSpeed = 1f;
     public float JumpForce = 10f;
     public float GravityModifer = 1f;
+    public float outOfBounds = -10f;
     public bool IsOnGround = true;
-    Rigidbody _Rigidbody;
+    public bool isAtCheckpoint = false;
+    public GameObject checkpointAreaObject;
+    public GameObject finishAreaObject;
     Vector3 _Movement;
+    Rigidbody _Rigidbody;
     Quaternion _Rotation = Quaternion.identity;
+    private Vector3 _defaultGravity = new Vector3(0f, -9.81f, 0f);
+    private Vector3 _startingPosition;
+    private Vector3 _checkpointPosition;
 
     // Start is called before the first frame update
     void Start()
     {
         _Rigidbody = GetComponent<Rigidbody>();
+        Physics.gravity = _defaultGravity;
         Physics.gravity *= GravityModifer;
+        _startingPosition = transform.position;
     }
 
     void Update()
@@ -26,6 +35,18 @@ public class JohnLemonMovement : MonoBehaviour
         {
             _Rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
             IsOnGround = false;
+        }
+
+        if(transform.position.y < outOfBounds)
+        {
+            if(isAtCheckpoint)
+            {
+                transform.position = _checkpointPosition;
+            }
+            else
+            {
+                transform.position = _startingPosition;
+            }
         }
     }
 
@@ -54,6 +75,21 @@ public class JohnLemonMovement : MonoBehaviour
         if(collision.gameObject.CompareTag("Ground"))
         {
             IsOnGround = true;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject == checkpointAreaObject)
+        {
+            isAtCheckpoint = true;
+            _checkpointPosition = checkpointAreaObject.transform.position;
+        }
+
+        if(other.gameObject == finishAreaObject)
+        {
+            isAtCheckpoint = false;
+            transform.position = _startingPosition;
         }
     }
 }
